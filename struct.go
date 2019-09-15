@@ -1,11 +1,5 @@
 package gostruct
 
-import (
-	"bytes"
-	"encoding/binary"
-	"fmt"
-)
-
 /*
 	gostruct
 
@@ -60,130 +54,8 @@ const (
 //EndianType Data endian type, BigEndian or LittleEndian
 type EndianType bool
 
-type encoder struct {
-	endian    EndianType
-	Formatter string
-}
-
-func (e *encoder) calcsize() (n int) {
-	dtysize := map[string]int{"c": 1, "b": 1, "B": 1, "?": 1, "h": 2, "H": 2, "i": 4, "I": 4, "l": 4, "L": 4, "q": 8, "Q": 8, "f": 4, "d": 8}
-	for _, v := range e.Formatter {
-		n += dtysize[string(v)]
-	}
-	return
-}
-
-func (e *encoder) Unpack(b []byte) (data []interface{}, err error) {
-	if len(b) < e.calcsize() {
-		return nil, fmt.Errorf("given data length %d do not match the 'encoder' type length %d", len(b), e.calcsize())
-	}
-	for _, v := range e.Formatter {
-		switch string(v) {
-		case "c":
-			data = append(data)
-		case "b":
-			return
-		case "B":
-			return
-		}
-	}
-	return
-}
-
-func (e *encoder) Pack(data []interface{}) (b []byte, err error) {
-	return
-}
-
-func chars2byte(c string, size int) (res []byte, err error) {
-	return
-}
-
-func bytes2char(b []byte) (c string, err error) {
-	return
-}
-
-// input byte length must be 1
-func byte2int8(b []byte, et EndianType) (n int8, err error) {
-	if b == nil || len(b) == 0 {
-		return 0, fmt.Errorf("input byte is empty or invaild")
-	}
-	if len(b) > 1 {
-		b = b[0:1]
-		err = fmt.Errorf("input byte beyong the int8 length")
-	}
-	var endiantype binary.ByteOrder
-	endiantype = binary.LittleEndian
-	if et {
-		endiantype = binary.BigEndian
-	}
-	buf := bytes.NewBuffer(b)
-	err = binary.Read(buf, endiantype, &n)
-	if err != nil {
-		return 0, err
-	}
-	return
-}
-
-// input 1 or 2 []byte
-func bytes2int8(b []byte, et EndianType) (n int8, err error) {
-	var endiantype binary.ByteOrder
-	endiantype = binary.LittleEndian
-	if et {
-		endiantype = binary.BigEndian
-	}
-	buf := bytes.NewBuffer(b)
-
-	switch len(b) {
-	case 1:
-		var x int8
-		err = binary.Read(buf, endiantype, &x)
-		n = x
-	case 2:
-		var x int16
-		err = binary.Read(buf, endiantype, &x)
-		n = int8(x)
-	default:
-		return 0, fmt.Errorf("input byte beyong the int8 length")
-	}
-	return
-}
-
-//return 1 []byte
-func int82byte(n int8, et EndianType) (res []byte, err error) {
-	var endiantype binary.ByteOrder
-	endiantype = binary.LittleEndian
-	if et {
-		endiantype = binary.BigEndian
-	}
-	buf := new(bytes.Buffer)
-	err = binary.Write(buf, endiantype, n)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-//return 2 []byte
-func int82bytes(n int8, et EndianType) (res []byte, err error) {
-	var endiantype binary.ByteOrder
-	endiantype = binary.LittleEndian
-	if et {
-		endiantype = binary.BigEndian
-	}
-	buf := new(bytes.Buffer)
-	err = binary.Write(buf, endiantype, n)
-	if err != nil {
-		return nil, err
-	}
-
-	if buf.Len() < 2 {
-		if et {
-			res = append(res, []byte{0x00}...)
-			res = append(res, buf.Bytes()...)
-		} else {
-			res = append(res, buf.Bytes()...)
-			res = append(res, []byte{0x00}...)
-		}
-	}
-	return res, nil
+//Encoder pack data to []byte or unpack data form byte
+type Encoder interface {
+	Unpack(b []byte) (data []interface{}, err error)
+	Pack(data []interface{}) (b []byte, err error)
 }
