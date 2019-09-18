@@ -22,9 +22,6 @@ package gostruct
 		Q		unsignedlonglong	long			uint64			8
 		f		float				float			float32			4
 		d		double				float			float64			8
-		s		char[]				string
-		p		char[]				string
-		P		void *				long
 
 */
 

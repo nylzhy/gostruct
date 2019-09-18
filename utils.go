@@ -25,6 +25,81 @@ func BytesToChar(b []byte) (c string, err error) {
 	return string(b), nil
 }
 
+// ByteToBools convert byte to bools, code '?'
+func ByteToBools(b byte) (res []bool) {
+	dict := map[string]bool{"0":false,"1":true}
+	result := make([]bool,8)
+	bstr := fmt.Sprintf("%b",b)
+	for i := range bstr {
+		result[len(bstr)-i-1] = dict[string(bstr[i])]
+	}
+	return result
+}
+
+
+// BytesToBools convert bytes to bools, code '?'
+func BytesToBools(b []byte,et EndianType) (res []bool, err error) {
+	for i := 0; i < len(b); i++ {
+		if et {
+			temp := ByteToBools(b[len(b)-i-1])
+			res = append(res, temp...)
+			continue
+		}
+		temp := ByteToBools(b[i])
+		res = append(res, temp...)
+	}
+	return 
+}
+
+// BoolsToByte convert bools to byte, code '?' convert less 8 bool data to bytes
+func BoolsToByte(b []bool) (res []byte, err error) {
+	if len(b) > 8 {
+		return []byte{0}, fmt.Errorf("input bool beyong the byte cap")
+	}
+	var n byte
+	for i := range b {
+		n = n << 1
+		if b[len(b)-i-1] {
+			n = n + 1
+		}
+	}
+	return []byte{n}, nil
+}
+
+// BoolsToBytes convert bools to byte, code '?' convert many bools data to bytes
+func BoolsToBytes(b []bool, et EndianType) (res []byte, err error) {
+	bsize := len(b)
+	if bsize <= 8 {
+		return BoolsToByte(b)
+	}
+	resulte := []byte{}
+	for i := 0; i < bsize/8+1; i++ {
+		left := i * 8
+		right := i*8 + 8
+		if right > bsize {
+			right = bsize
+		}
+		temp, _ := BoolsToByte(b[left:right])
+		resulte = append(resulte, temp...)
+	}
+	if et {
+		for i := range resulte {
+			res = append(res, resulte[len(resulte)-i-1])
+		}
+	} else {
+		res = resulte
+	}
+	return res, nil
+}
+
+// BoolToByte convert bool to byte, code '?' for one bool convert []byte{} with 1 length
+func BoolToByte(b bool) (res []byte, err error) {
+	if b {
+		return []byte{0x01}, nil
+	}
+	return []byte{0x00}, nil
+}
+
 // BytesToInt8 convert bytes to int8, code 'b'
 func BytesToInt8(b []byte, et EndianType) (n int8, err error) {
 	var endiantype binary.ByteOrder = binary.LittleEndian
