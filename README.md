@@ -1,13 +1,11 @@
 gostruct
-====================
+==================
 
-Package gostruct is a formatter/conversion tool between values(can be readable) and binary byte(net or device register).
 
-it's a Python/Sturct like-style packager, provide almost same usage and and add new for another type.
+Package gostruct is a formatter/conversion tool between values(can be readable) and binary byte(net or device register). it's a Python/Sturct like-style packager, provide almost same usage and and add new for another type.
 
 Format characters
-----------------------
-  
+-------------------------
 char	c type			Python type		Golang type		Standard size
 c		char				char		rune/string			1
 b		signed 				char/integer	int8			1
@@ -25,14 +23,14 @@ f		float				float			float32			4
 d		double				float			float64			8
 
 
-data type number range
----------------------
+
+data type range
+-----------------------
 
 - uint8       the set of all unsigned  8-bit integers (0 to 255)
 - uint16      the set of all unsigned 16-bit integers (0 to 65535)
 - uint32      the set of all unsigned 32-bit integers (0 to 4294967295)
 - uint64      the set of all unsigned 64-bit integers (0 to 18446744073709551615)
-
 
 
 - int8        the set of all signed  8-bit integers (-128 to 127)
