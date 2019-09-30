@@ -28,20 +28,170 @@ func (e *encoder) Unpack(b []byte) (data []interface{}, err error) {
 	if len(b) < e.calcsize() {
 		return nil, fmt.Errorf("given data length %d do not match the 'encoder' type length %d", len(b), e.calcsize())
 	}
+	il := 0
+	ir := 0
 	for _, v := range e.Formatter {
 		switch string(v) {
 		case "c":
-			data = append(data)
+			ir = il + 1
+			data = append(data, BytesToChar(b[il:ir]))
 		case "b":
-			return
+			ir = il + 1
+			temp, err := BytesToInt8(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, 0)
+			}
+			data = append(data, temp)
 		case "B":
-			return
+			ir = il + 1
+			temp, err := BytesToUint8(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, 0)
+			}
+			data = append(data, temp)
+		case "h":
+			ir = il + 2
+			temp, err := BytesToInt16(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, 0)
+			}
+			data = append(data, temp)
+		case "H":
+			ir = il + 2
+			temp, err := BytesToUint16(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, 0)
+			}
+			data = append(data, temp)
+		case "i", "l":
+			ir = il + 4
+			temp, err := BytesToInt32(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, 0)
+			}
+			data = append(data, temp)
+		case "I", "L":
+			ir = il + 4
+			temp, err := BytesToUint32(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, 0)
+			}
+			data = append(data, temp)
+		case "q":
+			ir = il + 8
+			temp, err := BytesToInt64(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, 0)
+			}
+			data = append(data, temp)
+		case "Q":
+			ir = il + 8
+			temp, err := BytesToUint64(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, 0)
+			}
+			data = append(data, temp)
+		case "f":
+			ir = il + 4
+			temp, err := BytesToFloat(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, -1.0)
+			}
+			data = append(data, temp)
+		case "d":
+			ir = il + 8
+			temp, err := BytesToDouble(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, -1.0)
+			}
+			data = append(data, temp)
+		case "?":
+			ir = il + 1
+			temp, err := BytesToBools(b[il:ir], e.endian)
+			if err != nil {
+				data = append(data, nil)
+			}
+			data = append(data, temp)
 		}
+		il = ir
 	}
 	return
 }
 
 func (e *encoder) Pack(data []interface{}) (b []byte, err error) {
+	for i, v := range e.Formatter {
+		switch string(v) {
+		case "c":
+			b = append(b, CharToBytes(data[i].(string))...)
+		case "b":
+			temp, err := Int8ToBytes(data[i].(int8), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+
+		case "B":
+			temp, err := Uint8ToBytes(data[i].(uint8), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		case "h":
+			temp, err := Int16ToBytes(data[i].(int16), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		case "H":
+			temp, err := Uint16ToBytes(data[i].(uint16), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		case "i", "l":
+			temp, err := Int32ToBytes(data[i].(int32), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		case "I", "L":
+			temp, err := Uint32ToBytes(data[i].(uint32), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		case "q":
+			temp, err := Int64ToBytes(data[i].(int64), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		case "Q":
+			temp, err := Uint64ToBytes(data[i].(uint64), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		case "f":
+			temp, err := FloatToBytes(data[i].(float32), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		case "d":
+			temp, err := DoubleToBytes(data[i].(float64), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		case "?":
+			temp, err := BoolsToBytes(data[i].([]bool), e.endian)
+			if err != nil {
+				return b, nil
+			}
+			b = append(b, temp...)
+		}
+	}
 	return
 }
 

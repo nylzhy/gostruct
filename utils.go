@@ -16,29 +16,28 @@ func CalcSizeof(s string) (n int) {
 }
 
 // CharToBytes convert string to byte, code 'c'
-func CharToBytes(c string, size int) (res []byte, err error) {
-	return
+func CharToBytes(c string) (res []byte) {
+	return []byte(c)
 }
 
 // BytesToChar convert bytes to string, code 'c'
-func BytesToChar(b []byte) (c string, err error) {
-	return string(b), nil
+func BytesToChar(b []byte) (c string) {
+	return string(b)
 }
 
 // ByteToBools convert byte to bools, code '?'
 func ByteToBools(b byte) (res []bool) {
-	dict := map[string]bool{"0":false,"1":true}
-	result := make([]bool,8)
-	bstr := fmt.Sprintf("%b",b)
+	dict := map[string]bool{"0": false, "1": true}
+	result := make([]bool, 8)
+	bstr := fmt.Sprintf("%b", b)
 	for i := range bstr {
 		result[len(bstr)-i-1] = dict[string(bstr[i])]
 	}
 	return result
 }
 
-
 // BytesToBools convert bytes to bools, code '?'
-func BytesToBools(b []byte,et EndianType) (res []bool, err error) {
+func BytesToBools(b []byte, et EndianType) (res []bool, err error) {
 	for i := 0; i < len(b); i++ {
 		if et {
 			temp := ByteToBools(b[len(b)-i-1])
@@ -48,7 +47,7 @@ func BytesToBools(b []byte,et EndianType) (res []bool, err error) {
 		temp := ByteToBools(b[i])
 		res = append(res, temp...)
 	}
-	return 
+	return
 }
 
 // BoolsToByte convert bools to byte, code '?' convert less 8 bool data to bytes
@@ -174,8 +173,8 @@ func BytesToUint8(b []byte, et EndianType) (n uint8, err error) {
 	return
 }
 
-// Uint82Bytes convert int8 to byte, code 'B', return 2 bytes
-func Uint82Bytes(n uint8, et EndianType) (res []byte, err error) {
+// Uint8ToBytes convert int8 to byte, code 'B', return 2 bytes
+func Uint8ToBytes(n uint8, et EndianType) (res []byte, err error) {
 	var endiantype binary.ByteOrder = binary.LittleEndian
 	if et {
 		endiantype = binary.BigEndian
