@@ -14,7 +14,7 @@ B		unsigned char		integer			uint8			1
 ?		_Bool				bool			boolt			1
 h		short				integer			int16			2
 H		unsigned short		integer			uint16			2
-i		int					integer			int				4
+i		int				integer			int				4
 I		unsigned int		integer			uint			4
 l		long				integer			int32			4
 L		unsigned long		long			uint32			4
